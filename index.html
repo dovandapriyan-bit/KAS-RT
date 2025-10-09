@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Manajemen RT Modern</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --sidebar: #1e1e2d;
+            --sidebar-hover: #2d2d44;
+            --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            background: var(--sidebar);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .mobile-nav .nav-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .mobile-nav .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 10px 5px;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: var(--transition);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .mobile-nav .nav-link.active {
+            color: white;
+            background: var(--primary);
+        }
+
+        .mobile-nav .nav-link i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            min-height: 100vh;
+            background: var(--sidebar);
+            transition: var(--transition);
+            box-shadow: 3px 0 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px 15px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #sidebar .sidebar-header h3 {
+            color: white;
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+
+        #sidebar .sidebar-header .rt-name {
+            font-size: 1rem;
+            opacity: 0.8;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        #sidebar .sidebar-header .rt-name:hover {
+            opacity: 1;
+            color: var(--success);
+        }
+
+        #sidebar ul.components {
+            padding: 20px 0;
+        }
+
+        #sidebar ul li a {
+            padding: 15px 20px;
+            font-size: 1rem;
+            display: block;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        #sidebar ul li a:hover {
+            color: white;
+            background: var(--sidebar-hover);
+            border-left: 3px solid var(--primary);
+        }
+
+        #sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            width: 25px;
+            text-align: center;
+        }
+
+        #sidebar ul li.active a {
+            background: var(--sidebar-hover);
+            color: white;
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Content Styles */
+        #content {
+            width: 100%;
+            min-height: 100vh;
+            transition: var(--transition);
+            padding: 20px;
+            padding-bottom: 80px; /* Space for mobile nav */
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 20px 25px;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        /* Table Styles */
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 500;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-color: rgba(0,0,0,0.05);
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            transition: var(--transition);
+            background: rgba(248,249,250,0.5);
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .file-upload-area i {
+            font-size: 3rem;
+            color: #adb5bd;
+            margin-bottom: 15px;
+        }
+
+        .file-preview {
+            max-width: 150px;
+            border-radius: 8px;
+            margin: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 20px 25px;
+        }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Photo Preview */
+        .photo-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .photo-preview {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview .remove-photo {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255,255,255,0.8);
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Dropdown Fix */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            transition: var(--transition);
+        }
+
+        .dropdown-item:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            #content {
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+
+            .navbar {
+                margin-bottom: 15px;
+            }
+
+            .card-body {
+                padding: 15px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-card .stat-value {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper d-flex">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-home me-2"></i> <span>RT MANAGER</span></h3>
+                <div class="rt-name mt-2" data-bs-toggle="modal" data-bs-target="#rtNameModal">
+                    <i class="fas fa-edit me-1"></i> <span id="currentRTName">RT 01 RW 05</span>
+                </div>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+                </li>
+                <li>
+                    <a onclick="showSection('kas')"><i class="fas fa-money-bill-wave"></i> <span>Kas RT</span></a>
+                </li>
+                <li>
+                    <a onclick="showSection('dasawisma')"><i class="fas fa-users"></i> <span>Dasawisma</span></a>
+                </li>
+                <li>
+                    <a onclick="showSection('data-warga')"><i class="fas fa-address-book"></i> <span>Data Warga</span></a>
+                </li>
+                <li>
+                    <a onclick="showSection('laporan')"><i class="fas fa-chart-bar"></i> <span>Laporan</span></a>
+                </li>
+                <li>
+                    <a onclick="showSection('pengaturan')"><i class="fas fa-cog"></i> <span>Pengaturan</span></a>
+                </li>
+            </ul>
+
+            <div class="p-3 text-center text-white position-absolute bottom-0 start-0 end-0">
+                <small>© 2024 RT Manager v2.0</small>
+            </div>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <nav class="mobile-nav">
+            <div class="nav-item">
+                <a class="nav-link active" onclick="showSection('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('kas')">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Kas RT</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('dasawisma')">
+                    <i class="fas fa-users"></i>
+                    <span>Dasawisma</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('data-warga')">
+                    <i class="fas fa-address-book"></i>
+                    <span>Warga</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('laporan')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Laporan</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content" class="p-0">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-primary d-none d-lg-block">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://ui-avatars.com/api/?name=Admin+RT&background=4361ee&color=fff" alt="Admin" width="40" height="40" class="rounded-circle me-2">
+                                <div class="d-none d-md-block">
+                                    <div class="fw-bold">Admin RT</div>
+                                    <small class="text-muted">Pengelola</small>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownUser">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Pengaturan</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> Keluar</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <div class="container-fluid">
+                    <!-- Stats Cards -->
+                    <div class="row">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);">
+                                <div class="stat-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="stat-value">Rp 12.5 Jt</div>
+                                <div class="stat-label">Total Kas RT</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);">
+                                <div class="stat-icon">
+                                    <i class="fas fa-piggy-bank"></i>
+                                </div>
+                                <div class="stat-value">Rp 8.2 Jt</div>
+                                <div class="stat-label">Total Simpanan</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #f72585 0%, #b5179e 100%);">
+                                <div class="stat-icon">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <div class="stat-value">Rp 5.7 Jt</div>
+                                <div class="stat-label">Pinjaman Aktif</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #4895ef 0%, #4361ee 100%);">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-value">42</div>
+                                <div class="stat-label">Warga Terdaftar</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Jumputan Section -->
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Hasil Jumputan Terkini</span>
+                                    <button class="btn btn-primary btn-sm" onclick="exportJumputanCSV()">
+                                        <i class="fas fa-download me-2"></i>Export CSV
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tanggal</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Keterangan</th>
+                                                    <th>Dokumentasi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>15 Des 2024</td>
+                                                    <td>Rp 350.000</td>
+                                                    <td>Jumputan bulan Desember</td>
+                                                    <td>
+                                                        <i class="fas fa-receipt text-primary me-2" title="Nota"></i>
+                                                        <i class="fas fa-camera text-success" title="Foto Barang"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>14 Nov 2024</td>
+                                                    <td>Rp 280.000</td>
+                                                    <td>Jumputan bulan November</td>
+                                                    <td>
+                                                        <i class="fas fa-receipt text-primary" title="Nota"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>16 Okt 2024</td>
+                                                    <td>Rp 320.000</td>
+                                                    <td>Jumputan bulan Oktober</td>
+                                                    <td>
+                                                        <i class="fas fa-receipt text-primary me-2" title="Nota"></i>
+                                                        <i class="fas fa-camera text-success" title="Foto Barang"></i>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-money-bill-wave fa-3x text-primary mb-3"></i>
+                                    <h5>Tambah Transaksi</h5>
+                                    <p class="text-muted">Catat pemasukan atau pengeluaran kas RT</p>
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transactionModal">
+                                        Mulai
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-users fa-3x text-success mb-3"></i>
+                                    <h5>Kelola Dasawisma</h5>
+                                    <p class="text-muted">Kelola simpan pinjam dan data dasawisma</p>
+                                    <button class="btn btn-success" onclick="showSection('dasawisma')">
+                                        Buka
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-chart-bar fa-3x text-warning mb-3"></i>
+                                    <h5>Lihat Laporan</h5>
+                                    <p class="text-muted">Analisis keuangan dan statistik RT</p>
+                                    <button class="btn btn-warning" onclick="showSection('laporan')">
+                                        Lihat
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kas RT Section -->
+            <div id="kas" class="content-section">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Manajemen Kas RT</h2>
+                        <div>
+                            <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#transactionModal">
+                                <i class="fas fa-plus me-2"></i>Tambah Transaksi
+                            </button>
+                            <button class="btn btn-success" onclick="exportKasCSV()">
+                                <i class="fas fa-download me-2"></i>Export CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0"><i class="fas fa-arrow-down me-2"></i>Pemasukan</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tanggal</th>
+                                                    <th>Jenis</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Dokumen</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>15/12/2024</td>
+                                                    <td>Jumputan</td>
+                                                    <td>Rp 350.000</td>
+                                                    <td>
+                                                        <i class="fas fa-receipt text-primary" title="Nota"></i>
+                                                        <i class="fas fa-camera text-success ms-2" title="Foto"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>10/12/2024</td>
+                                                    <td>Dasawisma</td>
+                                                    <td>Rp 250.000</td>
+                                                    <td>
+                                                        <i class="fas fa-receipt text-primary" title="Nota"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>05/12/2024</td>
+                                                    <td>Lainnya</td>
+                                                    <td>Rp 150.000</td>
+                                                    <td>
+                                                        <i class="fas fa-receipt text-primary" title="Nota"></i>
+                                                        <i class="fas fa-camera text-success ms-2" title="Foto"></i>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-danger text-white">
+                                    <h5 class="mb-0"><i class="fas fa-arrow-up me-2"></i>Pengeluaran</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Tanggal</th>
+                                                    <th>Keterangan</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Dokumen</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>14/12/2024</td>
+                                                    <td>Peralatan kebersihan</td>
+                                                    <td>Rp 185.000</td>
+                                                    <td>
+                                                        <i class="fas fa-receipt text-primary" title="Nota"></i>
+                                                        <i class="fas fa-camera text-success ms-2" title="Foto"></i>
+                                                        <i class="fas fa-file-alt text-warning ms-2" title="Agenda"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>08/12/2024</td>
+                                                    <td>Perbaikan jalan</td>
+                                                    <td>Rp 450.000</td>
+                                                    <td>
+                                                        <i class="fas fa-receipt text-primary" title="Nota"></i>
+                                                        <i class="fas fa-camera text-success ms-2" title="Foto"></i>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dasawisma Section -->
+            <div id="dasawisma" class="content-section">
+                <div class="container-fluid">
+                    <h2 class="mb-4">Dasawisma - Simpan Pinjam</h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0"><i class="fas fa-piggy-bank me-2"></i>Simpanan</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="simpananForm" onsubmit="tambahSimpanan(event)">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nama Anggota</label>
+                                            <select class="form-select" id="anggotaSimpanan" required>
+                                                <option value="">Pilih Anggota</option>
+                                                <option value="1">Ibu Siti Rahayu</option>
+                                                <option value="2">Ibu Budi Santoso</option>
+                                                <option value="3">Ibu Ahmad Fauzi</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Jumlah Simpanan</label>
+                                            <input type="number" class="form-control" id="jumlahSimpanan" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Tanggal</label>
+                                            <input type="date" class="form-control" id="tanggalSimpanan" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Tambah Simpanan</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="mb-0"><i class="fas fa-hand-holding-usd me-2"></i>Pinjaman</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="pinjamanForm" onsubmit="tambahPinjaman(event)">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nama Peminjam</label>
+                                            <select class="form-select" id="anggotaPinjaman" required>
+                                                <option value="">Pilih Anggota</option>
+                                                <option value="1">Ibu Siti Rahayu</option>
+                                                <option value="2">Ibu Budi Santoso</option>
+                                                <option value="3">Ibu Ahmad Fauzi</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Jumlah Pinjaman</label>
+                                            <input type="number" class="form-control" id="jumlahPinjaman" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Bunga (%) per tahun</label>
+                                            <input type="number" class="form-control" id="bungaPinjaman" value="10" step="0.1" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Tenor (Bulan)</label>
+                                            <input type="number" class="form-control" id="tenorPinjaman" value="12" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Tanggal Pinjam</label>
+                                            <input type="date" class="form-control" id="tanggalPinjaman" required>
+                                        </div>
+                                        <button type="button" class="btn btn-info" onclick="hitungCicilan()">Hitung Cicilan</button>
+                                        <button type="submit" class="btn btn-warning mt-2">Ajukan Pinjaman</button>
+                                    </form>
+                                    <div id="hasilHitung" class="mt-3 p-3 bg-light rounded" style="display: none;">
+                                        <h6>Hasil Perhitungan:</h6>
+                                        <p id="detailCicilan"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Daftar Simpanan</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm" id="tabelSimpanan">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nama</th>
+                                                    <th>Total Simpanan</th>
+                                                    <th>Terakhir</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Ibu Siti Rahayu</td>
+                                                    <td>Rp 1.200.000</td>
+                                                    <td>15 Des 2024</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ibu Budi Santoso</td>
+                                                    <td>Rp 850.000</td>
+                                                    <td>10 Des 2024</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ibu Ahmad Fauzi</td>
+                                                    <td>Rp 950.000</td>
+                                                    <td>12 Des 2024</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Pinjaman Aktif</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm" id="tabelPinjaman">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nama</th>
+                                                    <th>Pinjaman</th>
+                                                    <th>Sisa</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Ibu Siti Rahayu</td>
+                                                    <td>Rp 1.500.000</td>
+                                                    <td>Rp 1.200.000</td>
+                                                    <td><span class="badge bg-warning">Aktif</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ibu Ahmad Fauzi</td>
+                                                    <td>Rp 2.000.000</td>
+                                                    <td>Rp 800.000</td>
+                                                    <td><span class="badge bg-warning">Aktif</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Daftar Anggota Dasawisma</h5>
+                                    <button class="btn btn-success" onclick="exportDasawismaCSV()">
+                                        <i class="fas fa-download me-2"></i>Export CSV
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nama</th>
+                                                    <th>No. HP</th>
+                                                    <th>Alamat</th>
+                                                    <th>Blok Rumah</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Ibu Siti Rahayu</td>
+                                                    <td>081234567891</td>
+                                                    <td>Jl. Merdeka No. 15</td>
+                                                    <td>Blok A</td>
+                                                    <td><span class="badge bg-success">Aktif</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ibu Budi Santoso</td>
+                                                    <td>081234567890</td>
+                                                    <td>Jl. Merdeka No. 12</td>
+                                                    <td>Blok B</td>
+                                                    <td><span class="badge bg-success">Aktif</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ibu Ahmad Fauzi</td>
+                                                    <td>081234567892</td>
+                                                    <td>Jl. Merdeka No. 18</td>
+                                                    <td>Blok C</td>
+                                                    <td><span class="badge bg-success">Aktif</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Warga Section -->
+            <div id="data-warga" class="content-section">
+                <div class="container-fluid">
+                    <h2 class="mb-4">Data Warga RT</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Tambah Warga</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="wargaForm" onsubmit="tambahWarga(event)">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nama Lengkap</label>
+                                            <input type="text" class="form-control" id="namaWarga" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">No. KK</label>
+                                            <input type="text" class="form-control" id="noKK" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Alamat</label>
+                                            <textarea class="form-control" id="alamatWarga" rows="2" required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">No. Telepon</label>
+                                            <input type="text" class="form-control" id="teleponWarga" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Blok Rumah</label>
+                                            <input type="text" class="form-control" id="blokWarga" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Tambah Warga</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Daftar Warga</h5>
+                                    <div class="input-group" style="width: 300px;">
+                                        <input type="text" class="form-control" placeholder="Cari warga...">
+                                        <button class="btn btn-outline-primary" type="button">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="tabelWarga">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nama</th>
+                                                    <th>No. KK</th>
+                                                    <th>Alamat</th>
+                                                    <th>Telepon</th>
+                                                    <th>Blok</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Budi Santoso</td>
+                                                    <td>3501234567890123</td>
+                                                    <td>Jl. Merdeka No. 12</td>
+                                                    <td>081234567890</td>
+                                                    <td>Blok B</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                        <button class="btn btn-sm btn-outline-danger">Hapus</button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Siti Rahayu</td>
+                                                    <td>3501234567890124</td>
+                                                    <td>Jl. Merdeka No. 15</td>
+                                                    <td>081234567891</td>
+                                                    <td>Blok A</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                        <button class="btn btn-sm btn-outline-danger">Hapus</button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ahmad Fauzi</td>
+                                                    <td>3501234567890125</td>
+                                                    <td>Jl. Merdeka No. 18</td>
+                                                    <td>081234567892</td>
+                                                    <td>Blok C</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                        <button class="btn btn-sm btn-outline-danger">Hapus</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Laporan Section -->
+            <div id="laporan" class="content-section">
+                <div class="container-fluid">
+                    <h2 class="mb-4">Laporan Keuangan</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Statistik Kas Bulanan</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="kasChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Statistik Simpan Pinjam</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="simpanPinjamChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Aktivitas Terbaru</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <div class="bg-primary rounded-circle p-2 text-white">
+                                                    <i class="fas fa-money-bill-wave fa-fw"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <div class="fw-bold">Pemasukan Kas</div>
+                                                <small class="text-muted">Iuran warga - Rp 250.000</small>
+                                            </div>
+                                            <small class="text-muted">2 jam lalu</small>
+                                        </div>
+                                        <div class="list-group-item d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <div class="bg-success rounded-circle p-2 text-white">
+                                                    <i class="fas fa-piggy-bank fa-fw"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <div class="fw-bold">Simpanan Baru</div>
+                                                <small class="text-muted">Budi Santoso - Rp 100.000</small>
+                                            </div>
+                                            <small class="text-muted">5 jam lalu</small>
+                                        </div>
+                                        <div class="list-group-item d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <div class="bg-warning rounded-circle p-2 text-white">
+                                                    <i class="fas fa-hand-holding-usd fa-fw"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <div class="fw-bold">Pengajuan Pinjaman</div>
+                                                <small class="text-muted">Siti Rahayu - Rp 1.5 Jt</small>
+                                            </div>
+                                            <small class="text-muted">1 hari lalu</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pengaturan Section -->
+            <div id="pengaturan" class="content-section">
+                <div class="container-fluid">
+                    <h2 class="mb-4">Pengaturan Aplikasi</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Pengaturan Umum</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form onsubmit="simpanPengaturan(event)">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nama RT</label>
+                                            <input type="text" class="form-control" id="namaRT" value="RT 01" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Nama RW</label>
+                                            <input type="text" class="form-control" id="namaRW" value="RW 05" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Alamat Lengkap</label>
+                                            <textarea class="form-control" id="alamatRT" rows="3" required>Jl. Merdeka No. 1-20, Kelurahan Sukajadi, Kecamatan Bogor Timur</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Ketua RT</label>
+                                            <input type="text" class="form-control" id="ketuaRT" value="Budi Santoso" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="mb-0"><i class="fas fa-percentage me-2"></i>Pengaturan Keuangan</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form onsubmit="simpanPengaturanKeuangan(event)">
+                                        <div class="mb-3">
+                                            <label class="form-label">Bunga Pinjaman Default (%)</label>
+                                            <input type="number" class="form-control" id="bungaDefault" value="10" step="0.1" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Maksimal Pinjaman (Rp)</label>
+                                            <input type="number" class="form-control" id="maxPinjaman" value="5000000" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Tenor Maksimal (Bulan)</label>
+                                            <input type="number" class="form-control" id="maxTenor" value="24" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Iuran Bulanan (Rp)</label>
+                                            <input type="number" class="form-control" id="iuranBulanan" value="25000" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-warning">Simpan Pengaturan</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ganti Nama RT -->
+    <div class="modal fade" id="rtNameModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ubah Nama RT</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="newRTName" class="form-label">Nama RT Baru</label>
+                        <input type="text" class="form-control" id="newRTName" placeholder="Masukkan nama RT baru">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newRWName" class="form-label">Nama RW</label>
+                        <input type="text" class="form-control" id="newRWName" placeholder="Masukkan nama RW">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="updateRTName()">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Transaksi -->
+    <div class="modal fade" id="transactionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Transaksi Kas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="transactionForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Jenis Transaksi</label>
+                                <select class="form-select" id="transactionType" required onchange="togglePemasukanFields()">
+                                    <option value="">Pilih Jenis</option>
+                                    <option value="income">Pemasukan</option>
+                                    <option value="expense">Pengeluaran</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tanggal</label>
+                                <input type="date" class="form-control" id="tanggalTransaksi" required>
+                            </div>
+                        </div>
+                        
+                        <div id="pemasukanFields" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Sumber Pemasukan</label>
+                                <select class="form-select" id="sumberPemasukan">
+                                    <option value="">Pilih Sumber</option>
+                                    <option value="jumputan">Jumputan</option>
+                                    <option value="dasawisma">Dasawisma</option>
+                                    <option value="lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Jumlah (Rp)</label>
+                            <input type="number" class="form-control" id="jumlahTransaksi" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Keterangan</label>
+                            <textarea class="form-control" id="keteranganTransaksi" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Upload Dokumentasi (Min 1, Max 5 foto)</label>
+                            <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h5>Klik untuk memilih foto</h5>
+                                <p class="text-muted">Format: JPG, PNG (Maks. 5MB per file)</p>
+                                <input type="file" id="fileInput" multiple accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                            </div>
+                            <div class="photo-preview-container" id="photoPreview"></div>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Untuk transaksi pengeluaran, wajib melampirkan: Foto Agenda, Nota Pembelian, dan Foto Barang
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTransaction()">Simpan Transaksi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Data storage
+        let dataKas = [];
+        let dataSimpanan = [];
+        let dataPinjaman = [];
+        let dataWarga = [];
+
+        // Initialize with sample data
+        function initializeData() {
+            dataKas = [
+                { id: 1, tanggal: '2024-12-15', jenis: 'income', sumber: 'jumputan', jumlah: 350000, keterangan: 'Jumputan bulan Desember' },
+                { id: 2, tanggal: '2024-12-10', jenis: 'income', sumber: 'dasawisma', jumlah: 250000, keterangan: 'Iuran dasawisma' },
+                { id: 3, tanggal: '2024-12-14', jenis: 'expense', sumber: '', jumlah: 185000, keterangan: 'Peralatan kebersihan' }
+            ];
+
+            dataSimpanan = [
+                { id: 1, nama: 'Ibu Siti Rahayu', total: 1200000, terakhir: '2024-12-15' },
+                { id: 2, nama: 'Ibu Budi Santoso', total: 850000, terakhir: '2024-12-10' },
+                { id: 3, nama: 'Ibu Ahmad Fauzi', total: 950000, terakhir: '2024-12-12' }
+            ];
+
+            dataPinjaman = [
+                { id: 1, nama: 'Ibu Siti Rahayu', pinjaman: 1500000, sisa: 1200000, status: 'active' },
+                { id: 2, nama: 'Ibu Ahmad Fauzi', pinjaman: 2000000, sisa: 800000, status: 'active' }
+            ];
+
+            dataWarga = [
+                { id: 1, nama: 'Budi Santoso', noKK: '3501234567890123', alamat: 'Jl. Merdeka No. 12', telepon: '081234567890', blok: 'Blok B' },
+                { id: 2, nama: 'Siti Rahayu', noKK: '3501234567890124', alamat: 'Jl. Merdeka No. 15', telepon: '081234567891', blok: 'Blok A' },
+                { id: 3, nama: 'Ahmad Fauzi', noKK: '3501234567890125', alamat: 'Jl. Merdeka No. 18', telepon: '081234567892', blok: 'Blok C' }
+            ];
+        }
+
+        // Sidebar Toggle
+        document.getElementById('sidebarCollapse').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('content').classList.toggle('active');
+        });
+
+        // Show Section Function
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Update active menu in sidebar
+            document.querySelectorAll('#sidebar ul li').forEach(item => {
+                item.classList.remove('active');
+            });
+            const sidebarLinks = document.querySelectorAll('#sidebar ul li a');
+            for (let link of sidebarLinks) {
+                if (link.getAttribute('onclick') === `showSection('${sectionName}')`) {
+                    link.parentElement.classList.add('active');
+                    break;
+                }
+            }
+            
+            // Update active menu in mobile nav
+            document.querySelectorAll('.mobile-nav .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            const mobileLinks = document.querySelectorAll('.mobile-nav .nav-link');
+            for (let link of mobileLinks) {
+                if (link.getAttribute('onclick') === `showSection('${sectionName}')`) {
+                    link.classList.add('active');
+                    break;
+                }
+            }
+        }
+
+        // Update RT Name
+        function updateRTName() {
+            const newRTName = document.getElementById('newRTName').value;
+            const newRWName = document.getElementById('newRWName').value;
+            
+            if (newRTName && newRWName) {
+                document.getElementById('currentRTName').textContent = `${newRTName} ${newRWName}`;
+                const modal = bootstrap.Modal.getInstance(document.getElementById('rtNameModal'));
+                modal.hide();
+                
+                // Show success message
+                showAlert('Nama RT berhasil diperbarui!', 'success');
+            } else {
+                showAlert('Harap isi semua field!', 'danger');
+            }
+        }
+
+        // Toggle Pemasukan Fields
+        function togglePemasukanFields() {
+            const type = document.getElementById('transactionType').value;
+            const pemasukanFields = document.getElementById('pemasukanFields');
+            
+            if (type === 'income') {
+                pemasukanFields.style.display = 'block';
+            } else {
+                pemasukanFields.style.display = 'none';
+            }
+        }
+
+        // Handle File Select
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            const previewContainer = document.getElementById('photoPreview');
+            previewContainer.innerHTML = '';
+            
+            if (files.length > 5) {
+                showAlert('Maksimal 5 foto yang dapat diupload!', 'warning');
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type.match('image.*')) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (function(theFile) {
+                        return function(e) {
+                            const div = document.createElement('div');
+                            div.className = 'photo-preview';
+                            div.innerHTML = `
+                                <img src="${e.target.result}" title="${theFile.name}">
+                                <button type="button" class="remove-photo" onclick="removePhoto(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            previewContainer.appendChild(div);
+                        };
+                    })(file);
+                    
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        // Remove Photo
+        function removePhoto(button) {
+            button.parentElement.remove();
+        }
+
+        // Hitung Cicilan Pinjaman - PERBAIKAN RUMUS BUNGA
+        function hitungCicilan() {
+            const jumlah = parseFloat(document.getElementById('jumlahPinjaman').value);
+            const bunga = parseFloat(document.getElementById('bungaPinjaman').value);
+            const tenor = parseInt(document.getElementById('tenorPinjaman').value);
+            
+            if (jumlah && bunga && tenor) {
+                // PERBAIKAN: Rumus bunga yang benar
+                const bungaPerBulan = (bunga / 100) / 12;
+                const cicilan = (jumlah * bungaPerBulan * Math.pow(1 + bungaPerBulan, tenor)) / 
+                               (Math.pow(1 + bungaPerBulan, tenor) - 1);
+                const total = cicilan * tenor;
+                const totalBunga = total - jumlah;
+                
+                document.getElementById('detailCicilan').innerHTML = `
+                    <strong>Cicilan per bulan:</strong> Rp ${Math.round(cicilan).toLocaleString()}<br>
+                    <strong>Total pembayaran:</strong> Rp ${Math.round(total).toLocaleString()}<br>
+                    <strong>Total bunga:</strong> Rp ${Math.round(totalBunga).toLocaleString()}<br>
+                    <strong>Bunga per bulan:</strong> Rp ${Math.round(totalBunga / tenor).toLocaleString()}
+                `;
+                document.getElementById('hasilHitung').style.display = 'block';
+            } else {
+                showAlert('Harap isi semua field untuk menghitung cicilan!', 'warning');
+            }
+        }
+
+        // Save Transaction
+        function saveTransaction() {
+            const type = document.getElementById('transactionType').value;
+            const tanggal = document.getElementById('tanggalTransaksi').value;
+            const jumlah = document.getElementById('jumlahTransaksi').value;
+            const keterangan = document.getElementById('keteranganTransaksi').value;
+            const sumber = type === 'income' ? document.getElementById('sumberPemasukan').value : '';
+            
+            if (!type || !tanggal || !jumlah || !keterangan) {
+                showAlert('Harap isi semua field yang diperlukan!', 'warning');
+                return;
+            }
+            
+            const newTransaction = {
+                id: dataKas.length + 1,
+                tanggal: tanggal,
+                jenis: type,
+                sumber: sumber,
+                jumlah: parseInt(jumlah),
+                keterangan: keterangan
+            };
+            
+            dataKas.push(newTransaction);
+            showAlert('Transaksi berhasil disimpan!', 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('transactionModal'));
+            modal.hide();
+            
+            // Reset form
+            document.getElementById('transactionForm').reset();
+            document.getElementById('photoPreview').innerHTML = '';
+            document.getElementById('pemasukanFields').style.display = 'none';
+        }
+
+        // Tambah Simpanan
+        function tambahSimpanan(event) {
+            event.preventDefault();
+            const anggota = document.getElementById('anggotaSimpanan').value;
+            const jumlah = document.getElementById('jumlahSimpanan').value;
+            const tanggal = document.getElementById('tanggalSimpanan').value;
+            
+            if (!anggota || !jumlah || !tanggal) {
+                showAlert('Harap isi semua field!', 'warning');
+                return;
+            }
+            
+            const namaAnggota = document.getElementById('anggotaSimpanan').options[document.getElementById('anggotaSimpanan').selectedIndex].text;
+            
+            // Update existing or add new simpanan
+            const existingIndex = dataSimpanan.findIndex(item => item.nama === namaAnggota);
+            if (existingIndex !== -1) {
+                dataSimpanan[existingIndex].total += parseInt(jumlah);
+                dataSimpanan[existingIndex].terakhir = tanggal;
+            } else {
+                dataSimpanan.push({
+                    id: dataSimpanan.length + 1,
+                    nama: namaAnggota,
+                    total: parseInt(jumlah),
+                    terakhir: tanggal
+                });
+            }
+            
+            showAlert('Simpanan berhasil ditambahkan!', 'success');
+            document.getElementById('simpananForm').reset();
+        }
+
+        // Tambah Pinjaman
+        function tambahPinjaman(event) {
+            event.preventDefault();
+            const anggota = document.getElementById('anggotaPinjaman').value;
+            const jumlah = document.getElementById('jumlahPinjaman').value;
+            const bunga = document.getElementById('bungaPinjaman').value;
+            const tenor = document.getElementById('tenorPinjaman').value;
+            const tanggal = document.getElementById('tanggalPinjaman').value;
+            
+            if (!anggota || !jumlah || !bunga || !tenor || !tanggal) {
+                showAlert('Harap isi semua field!', 'warning');
+                return;
+            }
+            
+            const namaAnggota = document.getElementById('anggotaPinjaman').options[document.getElementById('anggotaPinjaman').selectedIndex].text;
+            
+            dataPinjaman.push({
+                id: dataPinjaman.length + 1,
+                nama: namaAnggota,
+                pinjaman: parseInt(jumlah),
+                sisa: parseInt(jumlah),
+                status: 'active',
+                bunga: parseFloat(bunga),
+                tenor: parseInt(tenor),
+                tanggal: tanggal
+            });
+            
+            showAlert('Pinjaman berhasil diajukan!', 'success');
+            document.getElementById('pinjamanForm').reset();
+            document.getElementById('hasilHitung').style.display = 'none';
+        }
+
+        // Tambah Warga
+        function tambahWarga(event) {
+            event.preventDefault();
+            const nama = document.getElementById('namaWarga').value;
+            const noKK = document.getElementById('noKK').value;
+            const alamat = document.getElementById('alamatWarga').value;
+            const telepon = document.getElementById('teleponWarga').value;
+            const blok = document.getElementById('blokWarga').value;
+            
+            if (!nama || !noKK || !alamat || !telepon || !blok) {
+                showAlert('Harap isi semua field!', 'warning');
+                return;
+            }
+            
+            dataWarga.push({
+                id: dataWarga.length + 1,
+                nama: nama,
+                noKK: noKK,
+                alamat: alamat,
+                telepon: telepon,
+                blok: blok
+            });
+            
+            showAlert('Data warga berhasil ditambahkan!', 'success');
+            document.getElementById('wargaForm').reset();
+        }
+
+        // Simpan Pengaturan
+        function simpanPengaturan(event) {
+            event.preventDefault();
+            showAlert('Pengaturan berhasil disimpan!', 'success');
+        }
+
+        function simpanPengaturanKeuangan(event) {
+            event.preventDefault();
+            showAlert('Pengaturan keuangan berhasil disimpan!', 'success');
+        }
+
+        // Export CSV Functions - FIXED
+        function exportKasCSV() {
+            let csvContent = "Tanggal,Jenis,Sumber,Jumlah,Keterangan\n";
+            
+            dataKas.forEach(transaksi => {
+                const row = [
+                    transaksi.tanggal,
+                    transaksi.jenis === 'income' ? 'Pemasukan' : 'Pengeluaran',
+                    transaksi.sumber || '-',
+                    'Rp ' + transaksi.jumlah.toLocaleString(),
+                    transaksi.keterangan
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+            
+            downloadCSV(csvContent, 'laporan_kas_rt.csv');
+            showAlert('Data Kas berhasil diexport ke CSV!', 'success');
+        }
+
+        function exportJumputanCSV() {
+            const jumputanData = dataKas.filter(transaksi => 
+                transaksi.jenis === 'income' && transaksi.sumber === 'jumputan'
+            );
+            
+            let csvContent = "Tanggal,Jumlah,Keterangan\n";
+            
+            jumputanData.forEach(transaksi => {
+                const row = [
+                    transaksi.tanggal,
+                    'Rp ' + transaksi.jumlah.toLocaleString(),
+                    transaksi.keterangan
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+            
+            downloadCSV(csvContent, 'laporan_jumputan.csv');
+            showAlert('Data Jumputan berhasil diexport ke CSV!', 'success');
+        }
+
+        function exportDasawismaCSV() {
+            let csvContent = "Nama,No HP,Alamat,Blok Rumah,Status\n";
+            
+            const anggotaDasawisma = [
+                { nama: 'Ibu Siti Rahayu', hp: '081234567891', alamat: 'Jl. Merdeka No. 15', blok: 'Blok A', status: 'Aktif' },
+                { nama: 'Ibu Budi Santoso', hp: '081234567890', alamat: 'Jl. Merdeka No. 12', blok: 'Blok B', status: 'Aktif' },
+                { nama: 'Ibu Ahmad Fauzi', hp: '081234567892', alamat: 'Jl. Merdeka No. 18', blok: 'Blok C', status: 'Aktif' }
+            ];
+            
+            anggotaDasawisma.forEach(anggota => {
+                const row = [
+                    anggota.nama,
+                    anggota.hp,
+                    anggota.alamat,
+                    anggota.blok,
+                    anggota.status
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+            
+            downloadCSV(csvContent, 'data_dasawisma.csv');
+            showAlert('Data Dasawisma berhasil diexport ke CSV!', 'success');
+        }
+
+        // Download CSV Helper
+        function downloadCSV(csvContent, filename) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Show Alert
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.minWidth = '300px';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        // Initialize Charts and Data
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+            
+            // Set current date for forms
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tanggalTransaksi').value = today;
+            document.getElementById('tanggalSimpanan').value = today;
+            document.getElementById('tanggalPinjaman').value = today;
+
+            // Kas Chart for Laporan
+            const kasCtx = document.getElementById('kasChart').getContext('2d');
+            new Chart(kasCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                    datasets: [{
+                        label: 'Saldo Kas',
+                        data: [8500000, 9200000, 9800000, 10500000, 11200000, 12500000],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Simpan Pinjam Chart for Laporan
+            const spCtx = document.getElementById('simpanPinjamChart').getContext('2d');
+            new Chart(spCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Simpanan Aktif', 'Pinjaman Aktif', 'Pinjaman Lunas'],
+                    datasets: [{
+                        data: [65, 25, 10],
+                        backgroundColor: ['#28a745', '#ffc107', '#17a2b8']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        });
+    </script>
+</body>
+</html>
