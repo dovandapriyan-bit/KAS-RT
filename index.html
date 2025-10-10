@@ -830,7 +830,7 @@
                                             <input type="number" class="form-control" id="jumlahPinjaman" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Bunga (%) per tahun</label>
+                                            <label class="form-label">Bunga (%) per Bulan</label>
                                             <input type="number" class="form-control" id="bungaPinjaman" value="10" step="0.1" required>
                                         </div>
                                         <div class="mb-3">
@@ -1211,7 +1211,7 @@
                                 <div class="card-body">
                                     <form onsubmit="simpanPengaturanKeuangan(event)">
                                         <div class="mb-3">
-                                            <label class="form-label">Bunga Pinjaman Default (%)</label>
+                                            <label class="form-label">Bunga Pinjaman 10% per Bulan (%)</label>
                                             <input type="number" class="form-control" id="bungaDefault" value="10" step="0.1" required>
                                         </div>
                                         <div class="mb-3">
@@ -1220,7 +1220,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Tenor Maksimal (Bulan)</label>
-                                            <input type="number" class="form-control" id="maxTenor" value="24" required>
+                                            <input type="number" class="form-control" id="maxTenor" value="12" required>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Iuran Bulanan (Rp)</label>
@@ -1481,30 +1481,31 @@
         }
 
         // Hitung Cicilan Pinjaman - PERBAIKAN RUMUS BUNGA
-        function hitungCicilan() {
-            const jumlah = parseFloat(document.getElementById('jumlahPinjaman').value);
-            const bunga = parseFloat(document.getElementById('bungaPinjaman').value);
-            const tenor = parseInt(document.getElementById('tenorPinjaman').value);
-            
-            if (jumlah && bunga && tenor) {
-                // PERBAIKAN: Rumus bunga yang benar
-                const bungaPerBulan = (bunga / 100) / 12;
-                const cicilan = (jumlah * bungaPerBulan * Math.pow(1 + bungaPerBulan, tenor)) / 
-                               (Math.pow(1 + bungaPerBulan, tenor) - 1);
-                const total = cicilan * tenor;
-                const totalBunga = total - jumlah;
-                
-                document.getElementById('detailCicilan').innerHTML = `
-                    <strong>Cicilan per bulan:</strong> Rp ${Math.round(cicilan).toLocaleString()}<br>
-                    <strong>Total pembayaran:</strong> Rp ${Math.round(total).toLocaleString()}<br>
-                    <strong>Total bunga:</strong> Rp ${Math.round(totalBunga).toLocaleString()}<br>
-                    <strong>Bunga per bulan:</strong> Rp ${Math.round(totalBunga / tenor).toLocaleString()}
-                `;
-                document.getElementById('hasilHitung').style.display = 'block';
-            } else {
-                showAlert('Harap isi semua field untuk menghitung cicilan!', 'warning');
-            }
-        }
+       function hitungCicilan() {
+    const jumlah = parseFloat(document.getElementById('jumlahPinjaman').value);
+    const bunga = parseFloat(document.getElementById('bungaPinjaman').value);
+    const tenor = parseInt(document.getElementById('tenorPinjaman').value);
+    
+    if (jumlah && bunga && tenor) {
+        // RUMUS BUNGA FLAT
+        const bungaPerBulan = (bunga / 100) * jumlah; // Bunga flat per bulan
+        const pokokPerBulan = jumlah / tenor; // Pokok per bulan
+        const cicilanPerBulan = pokokPerBulan + bungaPerBulan; // Total cicilan per bulan
+        const totalBayar = cicilanPerBulan * tenor; // Total yang harus dibayar
+        const totalBunga = bungaPerBulan * tenor; // Total bunga
+        
+        document.getElementById('detailCicilan').innerHTML = `
+            <strong>Cicilan per bulan:</strong> Rp ${Math.round(cicilanPerBulan).toLocaleString()}<br>
+            <strong>Pokok per bulan:</strong> Rp ${Math.round(pokokPerBulan).toLocaleString()}<br>
+            <strong>Bunga per bulan:</strong> Rp ${Math.round(bungaPerBulan).toLocaleString()}<br>
+            <strong>Total pembayaran:</strong> Rp ${Math.round(totalBayar).toLocaleString()}<br>
+            <strong>Total bunga:</strong> Rp ${Math.round(totalBunga).toLocaleString()}
+        `;
+        document.getElementById('hasilHitung').style.display = 'block';
+    } else {
+        showAlert('Harap isi semua field untuk menghitung cicilan!', 'warning');
+    }
+}
 
         // Save Transaction
         function saveTransaction() {
