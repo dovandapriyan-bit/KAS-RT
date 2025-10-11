@@ -1456,6 +1456,33 @@ document.getElementById('sidebarCollapse').addEventListener('click', function() 
     }
 });
 
+        function tambahAnggotaDasawisma() {
+    const nama = document.getElementById('namaAnggota').value;
+    const telepon = document.getElementById('teleponAnggota').value;
+    const alamat = document.getElementById('alamatAnggota').value;
+    const blok = document.getElementById('blokAnggota').value;
+    
+    if (!nama || !telepon || !alamat || !blok) {
+        showAlert('Harap isi semua field!', 'warning');
+        return;
+    }
+    
+    // Tambahkan ke data simpanan dengan saldo awal 0
+    dataSimpanan.push({
+        id: dataSimpanan.length + 1,
+        nama: nama,
+        total: 0,
+        terakhir: new Date().toISOString().split('T')[0]
+    });
+    
+    showAlert('Anggota berhasil ditambahkan!', 'success');
+    
+    // Reset form dan tutup modal
+    document.getElementById('formTambahAnggota').reset();
+    const modal = bootstrap.Modal.getInstance(document.getElementById('tambahAnggotaModal'));
+    modal.hide();
+}
+
 // Event Listener untuk tombol hamburger
 document.getElementById('sidebarCollapse').addEventListener('click', toggleSidebar);
         // Show Section Function
