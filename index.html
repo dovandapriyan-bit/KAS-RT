@@ -1474,6 +1474,15 @@ document.getElementById('sidebarCollapse').addEventListener('click', function() 
         total: 0,
         terakhir: new Date().toISOString().split('T')[0]
     });
+    // TAMBAH JUGA KE DATA WARGA
+    dataWarga.push({
+        id: dataWarga.length + 1,
+        nama: nama,
+        noKK: '-', // Default untuk anggota dasawisma
+        alamat: alamat,
+        telepon: telepon,
+        blok: blok
+    });
     
     showAlert('Anggota berhasil ditambahkan!', 'success');
     
@@ -1481,6 +1490,8 @@ document.getElementById('sidebarCollapse').addEventListener('click', function() 
     document.getElementById('formTambahAnggota').reset();
     const modal = bootstrap.Modal.getInstance(document.getElementById('tambahAnggotaModal'));
     modal.hide();
+
+    refreshDaftarAnggota();        
 }
 
 // Event Listener untuk tombol hamburger
@@ -1588,6 +1599,39 @@ document.getElementById('sidebarCollapse').addEventListener('click', toggleSideb
         function removePhoto(button) {
             button.parentElement.remove();
         }
+
+        function refreshDaftarAnggota() {
+    const tabel = document.querySelector('#dasawisma .table-hover tbody');
+    if (!tabel) return;
+    
+    tabel.innerHTML = '';
+    
+    dataSimpanan.forEach(anggota => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${anggota.nama}</td>
+            <td>${dataWarga.find(w => w.nama === anggota.nama)?.telepon || '-'}</td>
+            <td>${dataWarga.find(w => w.nama === anggota.nama)?.alamat || '-'}</td>
+            <td>${dataWarga.find(w => w.nama === anggota.nama)?.blok || '-'}</td>
+            <td><span class="badge bg-success">Aktif</span></td>
+        `;
+        tabel.appendChild(row);
+    });
+}
+        // Di function showSection(), tambahkan ini:
+function showSection(sectionName) {
+    // ... kode yang ada ...
+    
+    // Show selected section
+    document.getElementById(sectionName).classList.add('active');
+    
+    // Refresh data jika masuk ke Dasawisma
+    if (sectionName === 'dasawisma') {
+        refreshDaftarAnggota();
+    }
+    
+    // ... kode yang ada ...
+}
 
         // Hitung Cicilan Pinjaman - PERBAIKAN RUMUS BUNGA
        function hitungCicilan() {
@@ -1713,32 +1757,58 @@ document.getElementById('sidebarCollapse').addEventListener('click', toggleSideb
             document.getElementById('hasilHitung').style.display = 'none';
         }
 
-        // Tambah Warga
-        function tambahWarga(event) {
-            event.preventDefault();
-            const nama = document.getElementById('namaWarga').value;
-            const noKK = document.getElementById('noKK').value;
-            const alamat = document.getElementById('alamatWarga').value;
-            const telepon = document.getElementById('teleponWarga').value;
-            const blok = document.getElementById('blokWarga').value;
-            
-            if (!nama || !noKK || !alamat || !telepon || !blok) {
-                showAlert('Harap isi semua field!', 'warning');
-                return;
-            }
-            
-            dataWarga.push({
-                id: dataWarga.length + 1,
-                nama: nama,
-                noKK: noKK,
-                alamat: alamat,
-                telepon: telepon,
-                blok: blok
-            });
-            
-            showAlert('Data warga berhasil ditambahkan!', 'success');
-            document.getElementById('wargaForm').reset();
-        }
+       function tambahWarga(event) {
+    event.preventDefault();
+    const nama = document.getElementById('namaWarga').value;
+    const noKK = document.getElementById('noKK').value;
+    const alamat = document.getElementById('alamatWarga').value;
+    const telepon = document.getElementById('teleponWarga').value;
+    const blok = document.getElementById('blokWarga').value;
+    
+    if (!nama || !noKK || !alamat || !telepon || !blok) {
+        showAlert('Harap isi semua field!', 'warning');
+        return;
+    }
+    
+    dataWarga.push({
+        id: dataWarga.length + 1,
+        nama: nama,
+        noKK: noKK,
+        alamat: alamat,
+        telepon: telepon,
+        blok: blok
+    });
+    
+    showAlert('Data warga berhasil ditambahkan!', 'success');
+    document.getElementById('wargaForm').reset();
+    
+    // Refresh tampilan daftar warga
+    refreshDaftarWarga();
+}
+
+function refreshDaftarWarga() {
+    const tabel = document.getElementById('tabelWarga');
+    if (!tabel) return;
+    
+    const tbody = tabel.querySelector('tbody');
+    tbody.innerHTML = '';
+    
+    dataWarga.forEach(warga => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${warga.nama}</td>
+            <td>${warga.noKK}</td>
+            <td>${warga.alamat}</td>
+            <td>${warga.telepon}</td>
+            <td>${warga.blok}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary">Edit</button>
+                <button class="btn btn-sm btn-outline-danger">Hapus</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 
         // Simpan Pengaturan
         function simpanPengaturan(event) {
