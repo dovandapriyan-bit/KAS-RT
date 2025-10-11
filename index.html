@@ -808,10 +808,50 @@
                 </div>
             </div>
 
-            <!-- Dasawisma Section -->
-            <div id="dasawisma" class="content-section">
-                <div class="container-fluid">
-                    <h2 class="mb-4">Dasawisma - Simpan Pinjam</h2>
+
+            <!-- Modal Tambah Anggota -->
+<div class="modal fade" id="tambahAnggotaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Anggota Dasawisma</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formTambahAnggota">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" class="form-control" id="namaAnggota" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">No. Telepon</label>
+                        <input type="text" class="form-control" id="teleponAnggota" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Alamat</label>
+                        <textarea class="form-control" id="alamatAnggota" rows="2" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Blok Rumah</label>
+                        <input type="text" class="form-control" id="blokAnggota" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="tambahAnggotaDasawisma()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+           <!-- Di bagian Dasawisma Section, setelah heading -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Dasawisma - Simpan Pinjam</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahAnggotaModal">
+        <i class="fas fa-user-plus me-2"></i>Tambah Anggota
+    </button>
+</div>
                     
                     <div class="row mb-4">
                         <div class="col-md-6">
