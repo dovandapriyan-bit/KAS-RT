@@ -71,11 +71,29 @@
             margin-bottom: 5px;
         }
 
-        #sidebar {
-    transition: margin-left 0.3s ease;
+            /* Sidebar Toggle Styles */
+#sidebar {
+    transition: transform 0.3s ease;
 }
-#content {
-    transition: margin-left 0.3s ease;
+
+#sidebar.active {
+    transform: translateX(-100%);
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        height: 100vh;
+        z-index: 1001;
+    }
+    
+    #sidebar:not(.active) {
+        transform: translateX(0);
+    }
+    
+    #sidebar.active {
+        transform: translateX(-100%);
+    }
 }
 
         /* Sidebar Styles */
@@ -1378,17 +1396,10 @@
         }
 
        // Aktifkan tombol hamburger sidebar dengan animasi
+// Aktifkan tombol hamburger sidebar dengan toggle class
 document.getElementById('sidebarCollapse').addEventListener('click', function() {
     const sidebar = document.getElementById('sidebar');
-    const content = document.getElementById('content');
-    
-    if (sidebar.style.marginLeft === '-250px' || sidebar.style.marginLeft === '') {
-        sidebar.style.marginLeft = '0';
-        content.style.marginLeft = '250px';
-    } else {
-        sidebar.style.marginLeft = '-250px';
-        content.style.marginLeft = '0';
-    }
+    sidebar.classList.toggle('active');
 });
         // Show Section Function
         function showSection(sectionName) {
