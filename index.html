@@ -1405,11 +1405,16 @@
         }
 
        // Aktifkan tombol hamburger sidebar dengan animasi
-// Sidebar Toggle Function
-function toggleSidebar() {
+// Sidebar toggle function
+document.getElementById('sidebarCollapse').addEventListener('click', function() {
     const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('sidebar-collapsed');
-}
+    
+    if (sidebar.style.display === 'none') {
+        sidebar.style.display = 'block';
+    } else {
+        sidebar.style.display = 'none';
+    }
+});
 
 // Event Listener untuk tombol hamburger
 document.getElementById('sidebarCollapse').addEventListener('click', toggleSidebar);
