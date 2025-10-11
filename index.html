@@ -165,12 +165,21 @@
         }
 
         /* Content Styles */
-        #content {
-            width: 100%;
-            min-height: 100vh;
-            transition: var(--transition);
-            padding: 20px;
-            padding-bottom: 80px; /* Space for mobile nav */
+       #content {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+    padding: 20px;
+    padding-bottom: 80px;
+    margin-left: 0;
+}
+
+@media (min-width: 769px) {
+    #sidebar:not(.sidebar-collapsed) + #content {
+        width: calc(100% - 250px);
+        margin-left: 250px;
+    }
+}
         }
 
         .navbar {
@@ -1396,11 +1405,14 @@
         }
 
        // Aktifkan tombol hamburger sidebar dengan animasi
-// Aktifkan tombol hamburger sidebar dengan toggle class
-document.getElementById('sidebarCollapse').addEventListener('click', function() {
+// Sidebar Toggle Function
+function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('active');
-});
+    sidebar.classList.toggle('sidebar-collapsed');
+}
+
+// Event Listener untuk tombol hamburger
+document.getElementById('sidebarCollapse').addEventListener('click', toggleSidebar);
         // Show Section Function
         function showSection(sectionName) {
             // Hide all sections
